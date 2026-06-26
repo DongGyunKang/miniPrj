@@ -1,3 +1,4 @@
+/* 전체 앱 기본 색상과 폰트 설정 */
 :root {
   color: #17212b;
   background: #f5f7fa;
@@ -6,6 +7,7 @@
   text-rendering: optimizeLegibility;
 }
 
+/* 모든 요소가 padding/border를 포함해서 크기를 계산하도록 통일 */
 * {
   box-sizing: border-box;
 }
@@ -16,8 +18,11 @@ body {
   margin: 0;
 }
 
+/* 기본 입력 요소 스타일 */
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
@@ -32,14 +37,29 @@ button {
   padding: 0 16px;
 }
 
-input {
+input,
+select,
+textarea {
   width: 100%;
-  min-height: 40px;
   border: 1px solid #cad3d0;
   border-radius: 6px;
+  background: #fff;
+  color: #17212b;
+}
+
+input,
+select {
+  min-height: 40px;
   padding: 0 12px;
 }
 
+textarea {
+  min-height: 88px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+/* 전체 레이아웃과 상단 네비게이션 */
 .app-shell {
   min-height: 100vh;
 }
@@ -79,12 +99,14 @@ input {
   color: #16625a;
 }
 
+/* 본문 공통 폭 */
 .page {
   width: min(1120px, calc(100% - 40px));
   margin: 0 auto;
   padding: 32px 0;
 }
 
+/* 대시보드와 기본 패널 */
 .panel {
   border: 1px solid #dce4e1;
   border-radius: 8px;
@@ -113,6 +135,7 @@ h1 {
   line-height: 1.7;
 }
 
+/* 대시보드 지표 카드와 업무 모듈 카드 */
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -200,6 +223,7 @@ h1 {
   padding: 0 10px;
 }
 
+/* 화면 공통 제목/버튼/폼 */
 .content-stack {
   display: grid;
   gap: 20px;
@@ -218,12 +242,14 @@ h1 {
   color: #16625a;
 }
 
+/* 직원 등록 폼 */
 .employee-form {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
   gap: 10px;
 }
 
+/* 공통 테이블 */
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -246,15 +272,214 @@ h1 {
   font-size: 13px;
 }
 
+/* 링크형 버튼과 작은 액션 버튼 */
+.text-link,
+.ghost-link {
+  color: #16625a;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.small-button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  border-radius: 6px;
+  background: #eef4f2;
+  color: #16625a;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 0 10px;
+  text-decoration: none;
+}
+
+/* 상세 폼, 부서 카드, 근태 아코디언 공통 박스 */
+.detail-panel,
+.department-card,
+.accordion-card {
+  border: 1px solid #dce4e1;
+  border-radius: 8px;
+  background: #fff;
+  padding: 20px;
+}
+
+/* 입력 폼 그리드 */
+.form-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.form-grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-grid.four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.form-grid.report {
+  grid-template-columns: 160px 1fr 220px auto;
+  align-items: start;
+}
+
+.form-grid label,
+.field-title {
+  display: grid;
+  gap: 8px;
+  color: #43524e;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/* 부서 관리 화면 */
+.department-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid #e5ece9;
+  padding-bottom: 14px;
+}
+
+.department-head h2,
+.department-card h3,
+.report-box h3 {
+  margin: 0 0 10px;
+}
+
+.split-grid {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(0, 1.2fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #31423e;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 0 11px;
+}
+
+.top-gap {
+  margin-top: 10px;
+}
+
+.report-box {
+  border-top: 1px solid #e5ece9;
+  margin-top: 18px;
+  padding-top: 18px;
+}
+
+.report-list {
+  display: grid;
+  gap: 8px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.report-list li {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px;
+  border-radius: 6px;
+  background: #f8faf9;
+  padding: 10px 12px;
+}
+
+.check-line {
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  min-height: 40px;
+}
+
+.check-line input {
+  width: auto;
+  min-height: auto;
+}
+
+/* 근태 관리 아코디언 */
+.accordion-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.accordion-head {
+  display: grid;
+  grid-template-columns: 32px 1fr 1fr repeat(3, auto);
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 64px;
+  border-radius: 0;
+  background: #fff;
+  color: #17212b;
+  text-align: left;
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #16625a;
+  font-size: 28px;
+  transition: transform 0.15s ease;
+}
+
+.arrow.open {
+  transform: rotate(90deg);
+}
+
+.good {
+  color: #16625a;
+  font-weight: 800;
+}
+
+.bad {
+  color: #b3261e;
+  font-weight: 800;
+}
+
+.nested-table {
+  border-width: 1px 0 0;
+  border-radius: 0;
+}
+
+/* 안내/오류 메시지 */
 .muted {
   color: #5b716b;
 }
 
-.error {
+.error,
+.notice {
   color: #b3261e;
   font-weight: 700;
 }
 
+/* 모바일 레이아웃 */
 @media (max-width: 760px) {
   .topbar,
   .section-header {
@@ -264,7 +489,13 @@ h1 {
 
   .metric-grid,
   .module-grid,
-  .employee-form {
+  .employee-form,
+  .form-grid.two,
+  .form-grid.four,
+  .form-grid.report,
+  .split-grid,
+  .accordion-head,
+  .report-list li {
     grid-template-columns: 1fr;
   }
 
@@ -274,13 +505,19 @@ h1 {
   }
 }
 
+/* 태블릿 레이아웃 */
 @media (min-width: 761px) and (max-width: 1100px) {
   .metric-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .module-grid,
-  .employee-form {
+  .employee-form,
+  .form-grid.four {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form-grid.report {
+    grid-template-columns: 160px 1fr;
   }
 }

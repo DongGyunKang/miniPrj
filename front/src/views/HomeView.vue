@@ -8,6 +8,7 @@ const hrStore = useHrStore()
 
 <template>
   <section class="content-stack">
+    <!-- 인사관리시스템 첫 화면 소개 영역 -->
     <div class="dashboard-header">
       <div>
         <p class="eyebrow">Human Resources</p>
@@ -16,6 +17,7 @@ const hrStore = useHrStore()
       </div>
     </div>
 
+    <!-- 대시보드 요약 지표. hrStore.summary 계산값을 사용합니다. -->
     <div class="metric-grid">
       <article class="metric-tile">
         <span>업무 모듈</span>
@@ -35,6 +37,7 @@ const hrStore = useHrStore()
       </article>
     </div>
 
+    <!-- 업무 모듈 카드. 클릭하면 각 업무 화면으로 이동합니다. -->
     <section class="module-grid" aria-label="HR modules">
       <RouterLink
         v-for="module in hrStore.modules"

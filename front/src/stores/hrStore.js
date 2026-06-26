@@ -4,34 +4,36 @@ import { computed, ref } from 'vue'
 import http from '@/api/http'
 
 export const useHrStore = defineStore('hr', () => {
+  // 대시보드에 표시할 인사관리시스템 업무 메뉴입니다.
+  // 메뉴를 추가하면 라우터와 화면 파일도 같이 추가하면 됩니다.
   const modules = ref([
     {
       key: 'employees',
       name: '직원 관리',
-      description: '직원 기본정보, 부서, 직급, 입사일을 관리합니다.',
+      description: '직원 기본정보와 개인정보 변경을 관리합니다.',
       route: '/employees',
       status: '진행',
     },
     {
       key: 'departments',
       name: '부서 관리',
-      description: '조직도, 부서장, 소속 인원을 정리합니다.',
+      description: '부서장, 소속 인원, 주요업무, 아침 보고서를 관리합니다.',
       route: '/departments',
-      status: '설계',
+      status: '진행',
     },
     {
       key: 'attendance',
       name: '근태 관리',
-      description: '출근, 퇴근, 지각, 결근 내역을 확인합니다.',
+      description: '부서별 출근/결원 현황과 직원별 근태를 확인합니다.',
       route: '/attendance',
-      status: '설계',
+      status: '진행',
     },
     {
       key: 'leave',
       name: '휴가 관리',
-      description: '연차 신청, 승인, 잔여 휴가를 관리합니다.',
+      description: '휴가 종류를 선택해 신청하고 사용 현황을 확인합니다.',
       route: '/leave',
-      status: '설계',
+      status: '진행',
     },
     {
       key: 'admin',
@@ -42,39 +44,99 @@ export const useHrStore = defineStore('hr', () => {
     },
   ])
 
+  // 부서 관리 화면의 기본 데이터입니다.
+  // members는 부서별 소속 인원, mainTasks는 주요업무, morningReports는 아침 보고서 목록입니다.
   const departments = ref([
-    { id: 1, name: '인사팀', manager: 'Kim Admin', headcount: 4, role: '채용, 인사기록, 평가 운영' },
-    { id: 2, name: '개발팀', manager: 'Lee Staff', headcount: 12, role: '서비스 개발, 유지보수' },
-    { id: 3, name: '운영팀', manager: 'Park User', headcount: 7, role: '고객 운영, 정산, 현장 대응' },
+    {
+      id: 1,
+      name: '인사팀',
+      manager: 'Kim Admin',
+      members: ['Kim Admin', 'Han Recruiter', 'Choi HR', 'Yoon Clerk'],
+      mainTasks: '채용 일정 관리, 인사기록 정리, 평가 운영',
+      morningReports: [
+        { id: 1, date: '2026-06-26', content: '신규 입사자 서류 점검과 휴가 신청 건 확인 예정' },
+      ],
+    },
+    {
+      id: 2,
+      name: '개발팀',
+      manager: 'Lee Staff',
+      members: ['Lee Staff', 'Jung Dev', 'Moon QA', 'Seo Front'],
+      mainTasks: '인사관리 시스템 화면 개발, API 연동, 오류 수정',
+      morningReports: [
+        { id: 1, date: '2026-06-26', content: '직원 상세 화면과 부서 관리 화면 구조 점검' },
+      ],
+    },
+    {
+      id: 3,
+      name: '운영팀',
+      manager: 'Park User',
+      members: ['Park User', 'Oh Operator', 'Lim Support'],
+      mainTasks: '근태 데이터 확인, 사용자 문의 대응, 월간 운영 리포트 준비',
+      morningReports: [
+        { id: 1, date: '2026-06-26', content: '결원 인원 확인 후 부서장에게 공유' },
+      ],
+    },
   ])
 
+  // 근태 관리 화면의 기본 데이터입니다.
+  // status가 '출근'이면 출근 인원, 그 외에는 결원으로 계산합니다.
   const attendance = ref([
-    { id: 1, employee: 'Kim Admin', department: '인사팀', checkIn: '09:01', checkOut: '18:04', status: '정상' },
-    { id: 2, employee: 'Lee Staff', department: '개발팀', checkIn: '09:18', checkOut: '-', status: '지각' },
-    { id: 3, employee: 'Park User', department: '운영팀', checkIn: '08:55', checkOut: '18:10', status: '정상' },
+    { id: 1, employee: 'Kim Admin', department: '인사팀', checkIn: '09:01', checkOut: '18:04', status: '출근' },
+    { id: 2, employee: 'Han Recruiter', department: '인사팀', checkIn: '-', checkOut: '-', status: '결원' },
+    { id: 3, employee: 'Lee Staff', department: '개발팀', checkIn: '09:18', checkOut: '-', status: '출근' },
+    { id: 4, employee: 'Jung Dev', department: '개발팀', checkIn: '08:55', checkOut: '18:10', status: '출근' },
+    { id: 5, employee: 'Park User', department: '운영팀', checkIn: '08:57', checkOut: '18:02', status: '출근' },
+    { id: 6, employee: 'Oh Operator', department: '운영팀', checkIn: '-', checkOut: '-', status: '결원' },
   ])
 
+  // 휴가 관리 화면의 기본 데이터입니다.
+  // 나중에 leave_requests 같은 테이블로 분리하면 이 구조를 그대로 참고하면 됩니다.
   const leaveRequests = ref([
-    { id: 1, employee: 'Kim Admin', type: '연차', period: '2026-07-03', status: '승인대기' },
-    { id: 2, employee: 'Lee Staff', type: '오전반차', period: '2026-07-08', status: '승인' },
-    { id: 3, employee: 'Park User', type: '병가', period: '2026-07-12 ~ 2026-07-13', status: '검토' },
+    { id: 1, employee: 'Kim Admin', type: '연차', startDate: '2026-07-03', endDate: '2026-07-03', reason: '개인 일정', status: '승인대기' },
+    { id: 2, employee: 'Lee Staff', type: '오전반차', startDate: '2026-07-08', endDate: '2026-07-08', reason: '병원 방문', status: '승인' },
+    { id: 3, employee: 'Park User', type: '병가', startDate: '2026-07-12', endDate: '2026-07-13', reason: '치료', status: '검토' },
   ])
 
+  // 관리자 설정은 아직 세부 구현 전이라 목록만 유지합니다.
   const adminTasks = ref([
     { id: 1, name: '직급 코드 관리', owner: '인사팀', status: '예정' },
     { id: 2, name: '권한 그룹 관리', owner: '관리자', status: '설계' },
     { id: 3, name: '휴가 기준일 설정', owner: '인사팀', status: '예정' },
   ])
 
+  // 휴가 신청 폼의 라디오 버튼에 표시할 휴가 종류입니다.
+  const leaveTypes = ['연차', '오전반차', '오후반차', '병가', '경조사']
   const loading = ref(false)
 
+  // 근태 데이터를 부서별 카드 형태로 보여주기 위해 계산한 값입니다.
+  // AttendanceView.vue에서 부서별 출근/결원 숫자와 상세 인원 목록을 표시합니다.
+  const attendanceByDepartment = computed(() => departments.value.map((department) => {
+    const records = attendance.value.filter((item) => item.department === department.name)
+    const present = records.filter((item) => item.status === '출근').length
+    const absent = records.filter((item) => item.status !== '출근').length
+
+    return {
+      department: department.name,
+      manager: department.manager,
+      total: records.length,
+      present,
+      absent,
+      records,
+    }
+  }))
+
+  // 대시보드 상단 지표입니다.
+  // 실제 DB가 생기면 백엔드 summary API 값으로 바꾸거나 이 계산식을 유지해도 됩니다.
   const summary = computed(() => ({
     modules: modules.value.length,
     departments: departments.value.length,
-    todayAttendance: attendance.value.length,
+    todayAttendance: attendance.value.filter((item) => item.status === '출근').length,
     pendingLeaves: leaveRequests.value.filter((item) => item.status !== '승인').length,
   }))
 
+  // 백엔드 샘플 API에서 HR 데이터를 받아옵니다.
+  // 백엔드가 꺼져 있거나 DB/API 작업 중이면 catch에서 로컬 샘플 데이터를 그대로 유지합니다.
   async function loadHrData() {
     loading.value = true
 
@@ -93,20 +155,89 @@ export const useHrStore = defineStore('hr', () => {
       leaveRequests.value = leavesRes.data
       adminTasks.value = adminTasksRes.data
     } catch {
-      // Keep the local sample data when the backend is not running yet.
+      // DB/API 준비 전에는 로컬 샘플 데이터로 화면 구조를 유지합니다.
     } finally {
       loading.value = false
     }
+  }
+
+  // 부서 추가입니다.
+  // members는 "Kim, Lee, Park"처럼 쉼표로 입력받아 배열로 바꿉니다.
+  function addDepartment(payload) {
+    departments.value = [
+      ...departments.value,
+      {
+        id: Date.now(),
+        name: payload.name,
+        manager: payload.manager,
+        members: payload.members
+          .split(',')
+          .map((member) => member.trim())
+          .filter(Boolean),
+        mainTasks: payload.mainTasks,
+        morningReports: [],
+      },
+    ]
+  }
+
+  // 부서의 주요업무를 수정합니다.
+  // 아침 보고서를 받은 뒤 업무가 바뀌었을 때도 이 함수를 사용할 수 있습니다.
+  function updateDepartmentTasks(id, mainTasks) {
+    const department = departments.value.find((item) => String(item.id) === String(id))
+    if (department) {
+      department.mainTasks = mainTasks
+    }
+  }
+
+  // 부서별 아침 보고서를 추가합니다.
+  // updateTasks가 true이면 보고서 내용을 주요업무에도 바로 반영합니다.
+  function addMorningReport(id, payload) {
+    const department = departments.value.find((item) => String(item.id) === String(id))
+    if (!department) {
+      return
+    }
+
+    department.morningReports = [
+      {
+        id: Date.now(),
+        date: payload.date,
+        content: payload.content,
+      },
+      ...department.morningReports,
+    ]
+
+    if (payload.updateTasks) {
+      department.mainTasks = payload.content
+    }
+  }
+
+  // 휴가 신청을 화면 상태에 추가합니다.
+  // DB 연결 뒤에는 POST /api/hr/leaves와 연결하면 됩니다.
+  function addLeaveRequest(payload) {
+    leaveRequests.value = [
+      {
+        id: Date.now(),
+        status: '승인대기',
+        ...payload,
+      },
+      ...leaveRequests.value,
+    ]
   }
 
   return {
     modules,
     departments,
     attendance,
+    attendanceByDepartment,
     leaveRequests,
+    leaveTypes,
     adminTasks,
     loading,
     summary,
     loadHrData,
+    addDepartment,
+    updateDepartmentTasks,
+    addMorningReport,
+    addLeaveRequest,
   }
 })
