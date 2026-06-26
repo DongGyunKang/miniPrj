@@ -25,8 +25,8 @@ onMounted(() => {
 })
 
 // 휴가 신청 내역을 추가하고 폼을 초기화합니다.
-function submitLeave() {
-  hrStore.addLeaveRequest({ ...form })
+async function submitLeave() {
+  await hrStore.addLeaveRequest({ ...form })
   form.employee = ''
   form.type = '연차'
   form.startDate = ''

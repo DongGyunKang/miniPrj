@@ -163,48 +163,65 @@ export const useHrStore = defineStore('hr', () => {
 
   // 부서 추가입니다.
   // members는 "Kim, Lee, Park"처럼 쉼표로 입력받아 배열로 바꿉니다.
-  function addDepartment(payload) {
-    departments.value = [
-      ...departments.value,
-      {
-        id: Date.now(),
-        name: payload.name,
-        manager: payload.manager,
-        members: payload.members
-          .split(',')
-          .map((member) => member.trim())
-          .filter(Boolean),
-        mainTasks: payload.mainTasks,
-        morningReports: [],
-      },
-    ]
+  // 백엔드 API를 먼저 호출하고, 실패하면 화면 상태에만 임시 추가합니다.
+  async function addDepartment(payload) {
+    const department = {
+      id: Date.now(),
+      name: payload.name,
+      manager: payload.manager,
+      members: payload.members
+        .split(',')
+        .map((member) => member.trim())
+        .filter(Boolean),
+      mainTasks: payload.mainTasks,
+      morningReports: [],
+    }
+
+    try {
+      const { data } = await http.post('/hr/departments', department)
+      departments.value = [...departments.value, { ...department, ...data }]
+    } catch {
+      departments.value = [...departments.value, department]
+    }
   }
 
   // 부서의 주요업무를 수정합니다.
   // 아침 보고서를 받은 뒤 업무가 바뀌었을 때도 이 함수를 사용할 수 있습니다.
-  function updateDepartmentTasks(id, mainTasks) {
+  async function updateDepartmentTasks(id, mainTasks) {
     const department = departments.value.find((item) => String(item.id) === String(id))
     if (department) {
       department.mainTasks = mainTasks
+    }
+
+    try {
+      await http.post(`/hr/departments/${id}/tasks`, { mainTasks })
+    } catch {
+      // API가 아직 준비되지 않아도 화면 상태 수정은 유지합니다.
     }
   }
 
   // 부서별 아침 보고서를 추가합니다.
   // updateTasks가 true이면 보고서 내용을 주요업무에도 바로 반영합니다.
-  function addMorningReport(id, payload) {
+  async function addMorningReport(id, payload) {
     const department = departments.value.find((item) => String(item.id) === String(id))
     if (!department) {
       return
     }
 
-    department.morningReports = [
-      {
-        id: Date.now(),
-        date: payload.date,
-        content: payload.content,
-      },
-      ...department.morningReports,
-    ]
+    let report = {
+      id: Date.now(),
+      date: payload.date,
+      content: payload.content,
+    }
+
+    try {
+      const { data } = await http.post(`/hr/departments/${id}/morning-reports`, payload)
+      report = { ...report, ...data }
+    } catch {
+      // API가 아직 준비되지 않아도 화면 상태 추가는 유지합니다.
+    }
+
+    department.morningReports = [report, ...department.morningReports]
 
     if (payload.updateTasks) {
       department.mainTasks = payload.content
@@ -212,16 +229,22 @@ export const useHrStore = defineStore('hr', () => {
   }
 
   // 휴가 신청을 화면 상태에 추가합니다.
-  // DB 연결 뒤에는 POST /api/hr/leaves와 연결하면 됩니다.
-  function addLeaveRequest(payload) {
-    leaveRequests.value = [
-      {
-        id: Date.now(),
-        status: '승인대기',
-        ...payload,
-      },
-      ...leaveRequests.value,
-    ]
+  // 백엔드 API를 먼저 호출하고, 실패하면 화면 상태에만 임시 추가합니다.
+  async function addLeaveRequest(payload) {
+    let leaveRequest = {
+      id: Date.now(),
+      status: '승인대기',
+      ...payload,
+    }
+
+    try {
+      const { data } = await http.post('/hr/leaves', leaveRequest)
+      leaveRequest = { ...leaveRequest, ...data }
+    } catch {
+      // API가 아직 준비되지 않아도 화면 상태 추가는 유지합니다.
+    }
+
+    leaveRequests.value = [leaveRequest, ...leaveRequests.value]
   }
 
   return {

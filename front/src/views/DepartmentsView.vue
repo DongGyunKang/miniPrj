@@ -41,8 +41,8 @@ watchEffect(() => {
 })
 
 // 새 부서를 추가하고 입력값을 초기화합니다.
-function submitDepartment() {
-  hrStore.addDepartment({ ...departmentForm })
+async function submitDepartment() {
+  await hrStore.addDepartment({ ...departmentForm })
   departmentForm.name = ''
   departmentForm.manager = ''
   departmentForm.members = ''
@@ -50,14 +50,14 @@ function submitDepartment() {
 }
 
 // 부서의 주요업무만 따로 저장합니다.
-function saveTasks(department) {
-  hrStore.updateDepartmentTasks(department.id, taskForms[department.id])
+async function saveTasks(department) {
+  await hrStore.updateDepartmentTasks(department.id, taskForms[department.id])
 }
 
 // 아침 보고서를 등록합니다.
 // 체크박스가 켜져 있으면 보고 내용이 부서 주요업무에도 반영됩니다.
-function submitReport(department) {
-  hrStore.addMorningReport(department.id, { ...reportForms[department.id] })
+async function submitReport(department) {
+  await hrStore.addMorningReport(department.id, { ...reportForms[department.id] })
   reportForms[department.id].content = ''
   taskForms[department.id] = department.mainTasks
 }
