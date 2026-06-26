@@ -1,1 +1,6 @@
 jdk-17.0.12
+*.log
+node_modules/
+dist/
+build/
+.gradle/
